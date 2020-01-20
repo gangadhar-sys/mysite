@@ -1,0 +1,85 @@
+#!/bin/bash
+clear
+echo "lets go" 
+apt-get update
+#add bitcoin ppa
+add-apt-repository ppa:bitcoin/bitcoin
+apt-get install bitcoind bitcoin-tx
+echo " bitcoin intalled " 
+userdel bitcoin
+echo 'Now create a user for bitcoin and  your user should  be "bitcoin" :)'
+sleep 3
+echo -n "Enter the username: "
+read username
+read -r -p "Are You Sure? [Y/n] " input
+case $input in
+    [yY][eE][sS]|[yY])
+    adduser "$username"
+ ;;
+    [nN][oO]|[nN])
+ echo "No"
+ echo -n "Enter username again: "
+ read username
+ adduser "$username"
+       ;;
+    *)
+ echo "Invalid input..."
+ exit 1
+ ;;
+esac
+#copy bitcoid commands in /usr/local/bin/
+cp /usr/bin/bitcoin* /usr/local/bin/
+echo "user created and Now create a bitcoin.service file "
+sleep 3
+echo "give me a service file name : "
+read file
+touch /home/bitcoin/$file
+cp -av copy.txt /home/bitcoin/$file
+ln -s /home/bitcoin/$file /etc/systemd/system/$file
+echo "Now your $file is created you can check by systemctl status $file"
+#bitcoin datadir 
+touch /btc-data/bitcoin/bitcoin.conf
+cp -av copy2.txt /btc-data/bitcoin/bitcoin.conf
+setfacl -m  u:bitcoin:rwx /btc-data/
+ln -s /btc-data/bitcoin/ /home/bitcoin/.bitcoin
+chown  bitcoin:bitcoin -R /home/bitcoin/.bitcoin
+chown  bitcoin:bitcoin -R /btc-data/bitcoin
+echo " now check the bitcoin status "
+exit 0
+-------------------------------------------------------------
+create copy.txt 
+
+[Unit]
+Description=Bitcoind service 
+After=syslog.target network.target
+[Service]
+User=bitcoin
+Group=bitcoin
+Type=forking
+PIDFile=/home/bitcoin/.bitcoin/bitcoind.pid
+ExecStart=/usr/local/bin/bitcoind -daemon
+ExecStop=/usr/local/bin/bitcoin-cli stop
+Restart=always
+TimeoutSec=20
+KillMode=process
+[Install]
+WantedBy=multi-user.target
+-----------------------------
+copy2.txt
+
+dbcache=4000
+txindex=1
+reindex=1
+# [rpc]
+# Accept command line and JSON-RPC commands.
+server=1
+#rpcport=8332
+# Username for JSON-RPC connections
+rpcuser=Amelia
+# Password for JSON-RPC connections
+rpcpassword=Xany8V5mRxZ6tec9
+rpcallowip=0.0.0.0/0
+printtoconsole=1
+rpcbind=0.0.0.0:8332 
+---------------------------------
+put in same directory 
