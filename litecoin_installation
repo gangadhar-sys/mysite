@@ -1,0 +1,51 @@
+#!/bin/bash 
+apt-get update
+wget https://download.litecoin.org/litecoin-0.16.3/linux/litecoin-0.16.3-x86_64-linux-gnu.tar.gz
+tar -xvf litecoin-0.16.3-x86_64-linux-gnu.tar.gz
+cp litecoin-0.16.3/bin/* /usr/local/bin/
+rm -rf litecoin-0.16.3*
+echo " your installation is completed " 
+sleep 3
+#echo "To check type lite+tab " 
+echo 'Now create a user for litecoin and  your user should  be "litecoin" :)'
+echo -n "Enter the username: "
+read username
+read -r -p "Are You Sure? [Y/n] " input
+case $input in
+    [yY][eE][sS]|[yY])
+    adduser "$username"
+ ;;
+    [nN][oO]|[nN])
+ echo "No"
+ echo -n "Enter username again: "
+ read username
+ adduser "$username"
+       ;;
+    *)
+ echo "Invalid input..."
+ exit 1
+ ;;
+esac
+echo "user created and Now create a litecoin.service file "
+sleep 3
+echo "give me a service file name : "
+read file
+touch /home/litecoin/$file
+cp -av copy.txt /home/litecoin/$file
+ln -s /home/litecoin/$file /etc/systemd/system/$file
+echo "Now your $file is created you can check by systemctl status litecoin.service"
+#dash_coin datadir
+#mkdir -p /home/bitcoin/.bitcoin
+touch /data/blockchains/litecoin/litecoin.conf
+cp -av copy2.txt /data/blockchains/litecoin/litecoin.conf
+#setfacl -m  u:litecoin:rwx  /data
+#setfacl -m  u:litecoin:rwx  /data/blockchains
+#chown -R litecoin:litecoin /data/blockchains/litecoin/
+#ln -s /data/blockchains/litecoin /home/litecoin/.litecoin
+chown  litecoin:litecoin -R /home/litecoin/.litecoin
+#now add a user in sudo group
+#usermod -aG sudo litecoin
+#setfacl -m  u:dash:rwx -R /volume_data
+#setfacl -m  u:dash:rwx -R /volume_data/blockchain
+echo " now check the litecoin status "
+exit 0
