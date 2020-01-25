@@ -1,0 +1,15 @@
+[Unit]
+Description=litecoin service
+After=syslog.target network.target
+[Service]
+User=litecoin
+Group=litecoin
+Type=forking
+PIDFile=/home/litecoin/.litecoin/litecoind.pid
+ExecStart=/usr/local/bin/litecoind -daemon -rpcport=9332 -datadir=/home/litecoin/.litecoin -conf=/home/litecoin/.litecoin/litecoin.conf -daemon
+ExecStop=/usr/local/bin/litecoin-cli stop
+Restart=always
+TimeoutSec=20
+KillMode=process
+[Install]
+WantedBy=multi-user.target
